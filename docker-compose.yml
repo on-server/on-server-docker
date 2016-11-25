@@ -1,0 +1,122 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./containers/nginx-custom/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./containers/nginx-custom/proxy.conf:/etc/nginx/proxy.conf:ro
+      - ./containers/nginx-custom/proxy-ssl.conf:/etc/nginx/proxy-ssl.conf:ro
+      - ./containers/nginx-custom/security.conf:/etc/nginx/security.conf:ro
+      - nginx:/srv/nginx:ro
+      - users:/home:ro
+    networks:
+      net:
+        ipv4_address: 172.16.238.10
+    ports:
+      - "${NGINX_HTTP_HOST}:${NGINX_HTTP_PORT}:80"
+      - "${NGINX_HTTPS_HOST}:${NGINX_HTTPS_PORT}:443"
+    depends_on:
+      - apache2
+
+  apache2:
+    image: flyin/docker-apache2-itk
+    volumes:
+      - users:/home:rw
+      - apache2:/srv/apache2:ro
+    networks:
+      net:
+        ipv4_address: 172.16.238.20
+    cap_add:
+      - SYS_NICE
+      - DAC_READ_SEARCH
+
+  mysql55:
+    image: mysql:5.5
+    volumes:
+      - ./containers/mysql-custom:/etc/mysql/conf.d
+      - mysql55:/var/lib/mysql
+    networks:
+      net:
+        aliases:
+          - mysql
+        ipv4_address: 172.16.238.30
+    ports:
+      - "${MYSQL55_HOST}:${MYSQL55_PORT}:3306"
+    env_file:
+      - ./envs/mysql55.env
+
+  mysql57:
+    image: mysql:5.7
+    volumes:
+      - ./containers/mysql-custom:/etc/mysql/conf.d
+      - mysql57:/var/lib/mysql
+    networks:
+      net:
+        ipv4_address: 172.16.238.40
+    ports:
+      - "${MYSQL57_HOST}:${MYSQL57_PORT}:3306"
+    env_file:
+      - ./envs/mysql57.env
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    networks:
+      net:
+        ipv4_address: 172.16.238.50
+    ports:
+      - "${PHPMYADMIN_HOST}:${PHPMYADMIN_PORT}:80"
+    depends_on:
+      - mysql55
+      - mysql57
+    env_file:
+      - ./envs/phpmyadmin.env
+
+  postgresql:
+    image: flyin/docker-postgresql
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    networks:
+      net:
+        ipv4_address: 172.16.238.60
+    ports:
+      - "${POSTGRESQL_HOST}:${POSTGRESQL_PORT}:5432"
+    env_file:
+      - ./envs/postgresql.env
+
+  proftpd:
+    image: flyin/docker-proftpd
+    networks:
+      net:
+        ipv4_address: 172.16.238.70
+    ports:
+      - "${FTP_HOST}:${FTP_ACTIVE}:20-21"
+      - "${FTP_HOST}:${FTP_PASSIVE}:50000-50100"
+    volumes:
+      - users:/home:rw
+    depends_on:
+      - postgresql
+    env_file:
+      - ./envs/proftpd.env
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1
+
+volumes:
+  apache2:
+    driver: local
+  mysql55:
+    driver: local
+  mysql57:
+    driver: local
+  nginx:
+    driver: local
+  postgresql:
+    driver: local
+  users:
+    driver: local
