@@ -1,5 +1,19 @@
 version: '2'
 services:
+  apache2:
+    image: flyin/apache2-itk
+    volumes:
+      - users:/home:rw
+      - apache2:/srv/apache2:ro
+    networks:
+      net:
+        ipv4_address: 172.16.238.20
+    cap_add:
+      - SYS_NICE
+      - DAC_READ_SEARCH
+    env_file:
+      - ./envs/apache2.env
+
   nginx:
     image: nginx:stable
     volumes:
@@ -15,20 +29,6 @@ services:
     ports:
       - "${NGINX_HTTP_HOST}:${NGINX_HTTP_PORT}:80"
       - "${NGINX_HTTPS_HOST}:${NGINX_HTTPS_PORT}:443"
-    depends_on:
-      - apache2
-
-  apache2:
-    image: flyin/docker-apache2-itk
-    volumes:
-      - users:/home:rw
-      - apache2:/srv/apache2:ro
-    networks:
-      net:
-        ipv4_address: 172.16.238.20
-    cap_add:
-      - SYS_NICE
-      - DAC_READ_SEARCH
 
   mysql55:
     image: mysql:5.5
@@ -37,8 +37,6 @@ services:
       - mysql55:/var/lib/mysql
     networks:
       net:
-        aliases:
-          - mysql
         ipv4_address: 172.16.238.30
     ports:
       - "${MYSQL55_HOST}:${MYSQL55_PORT}:3306"
@@ -71,30 +69,18 @@ services:
     env_file:
       - ./envs/phpmyadmin.env
 
-  postgresql:
-    image: flyin/docker-postgresql
-    volumes:
-      - postgresql:/var/lib/postgresql/data
+  proftpd:
+    image: flyin/proftpd
     networks:
       net:
         ipv4_address: 172.16.238.60
     ports:
-      - "${POSTGRESQL_HOST}:${POSTGRESQL_PORT}:5432"
-    env_file:
-      - ./envs/postgresql.env
-
-  proftpd:
-    image: flyin/docker-proftpd
-    networks:
-      net:
-        ipv4_address: 172.16.238.70
-    ports:
-      - "${FTP_HOST}:${FTP_ACTIVE}:20-21"
-      - "${FTP_HOST}:${FTP_PASSIVE}:50000-50100"
+      - "${FTP_HOST}:${FTP_ACTIVE_LOW}-${FTP_ACTIVE_HIGH}:${FTP_ACTIVE_LOW}-${FTP_ACTIVE_HIGH}"
+      - "${FTP_HOST}:${FTP_PASSIVE_LOW}-${FTP_PASSIVE_HIGH}:${FTP_PASSIVE_LOW}-${FTP_PASSIVE_HIGH}"
     volumes:
       - users:/home:rw
     depends_on:
-      - postgresql
+      - mysql57
     env_file:
       - ./envs/proftpd.env
 
@@ -115,8 +101,6 @@ volumes:
   mysql57:
     driver: local
   nginx:
-    driver: local
-  postgresql:
     driver: local
   users:
     driver: local
