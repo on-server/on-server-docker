@@ -42,6 +42,9 @@ services:
     networks:
       net:
         ipv4_address: 172.16.238.30
+        aliases:
+          - mysql
+          - mysql.local
     ports:
       - "${MYSQL55_HOST}:${MYSQL55_PORT}:3306"
     env_file:
@@ -79,7 +82,7 @@ services:
       net:
         ipv4_address: 172.16.238.60
     ports:
-      - "${FTP_HOST}:${FTP_ACTIVE_LOW}-${FTP_ACTIVE_HIGH}:${FTP_ACTIVE_LOW}-${FTP_ACTIVE_HIGH}"
+      - "${FTP_HOST}:${FTP_ACTIVE_LOW}-${FTP_ACTIVE_HIGH}:20-21"
       - "${FTP_HOST}:${FTP_PASSIVE_LOW}-${FTP_PASSIVE_HIGH}:${FTP_PASSIVE_LOW}-${FTP_PASSIVE_HIGH}"
     volumes:
       - users:/home:rw
