@@ -1,6 +1,7 @@
 version: '2'
 services:
   apache2:
+    restart: unless-stopped
     image: flyin/apache2-itk
     volumes:
       - users:/home:rw
@@ -15,6 +16,7 @@ services:
       - ./envs/apache2.env
 
   nginx:
+    restart: unless-stopped
     image: nginx:stable
     volumes:
       - ./containers/nginx-custom/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -35,6 +37,7 @@ services:
       - api
 
   mysql55:
+    restart: unless-stopped
     image: mysql:5.5
     volumes:
       - ./containers/mysql-custom:/etc/mysql/conf.d
@@ -48,6 +51,7 @@ services:
       - ./envs/mysql55.env
 
   mysql57:
+    restart: unless-stopped
     image: mysql:5.7
     volumes:
       - ./containers/mysql-custom:/etc/mysql/conf.d
@@ -61,6 +65,7 @@ services:
       - ./envs/mysql57.env
 
   phpmyadmin:
+    restart: unless-stopped
     image: phpmyadmin/phpmyadmin
     networks:
       net:
@@ -74,6 +79,7 @@ services:
       - ./envs/phpmyadmin.env
 
   proftpd:
+    restart: unless-stopped
     image: flyin/proftpd
     networks:
       net:
@@ -89,6 +95,7 @@ services:
       - ./envs/proftpd.env
 
   api:
+    restart: unless-stopped
     image: flyin/on-server-api:master
     networks:
       net:
