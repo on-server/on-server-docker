@@ -42,9 +42,6 @@ services:
     networks:
       net:
         ipv4_address: 172.16.238.30
-        aliases:
-          - mysql
-          - mysql.local
     ports:
       - "${MYSQL55_HOST}:${MYSQL55_PORT}:3306"
     env_file:
