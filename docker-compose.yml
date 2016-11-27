@@ -1,18 +1,5 @@
 version: '2'
 services:
-  # TODO: add registry
-  # registry:
-  #  restart: always
-  #  image: registry:2
-  #  ports:
-  #    - 5000:5000
-  #  env_file:
-  #    - ./envs/registry.env
-  #  volumes:
-  #    - registry:/srv/data
-  #    - /etc/letsencrypt/live/${REGISTRY_DOMAIN}:/srv/letsencrypt:ro
-  #    - ./containers/registry/auth:/auth
-
   apache2:
     restart: unless-stopped
     image: flyin/apache2-itk
@@ -32,12 +19,10 @@ services:
     restart: unless-stopped
     image: nginx:stable
     volumes:
+      - /etc/letsencrypt/:/srv/letsencrypt:ro
       - ./containers/nginx-custom/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./containers/nginx-custom/proxy.conf:/etc/nginx/proxy.conf:ro
-      - ./containers/nginx-custom/proxy-ssl.conf:/etc/nginx/proxy-ssl.conf:ro
-      - ./containers/nginx-custom/security.conf:/etc/nginx/security.conf:ro
       - nginx:/srv/nginx:ro
-      - users:/home:ro
+      - users:/srv/home:ro
       - api:/srv/api:ro
     networks:
       net:
