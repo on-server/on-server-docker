@@ -21,6 +21,7 @@ services:
     volumes:
       - /etc/letsencrypt/:/srv/letsencrypt:ro
       - ./containers/nginx-custom/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./containers/nginx-custom/conf.d:/etc/nginx/conf.d:ro
       - nginx:/srv/nginx:ro
       - users:/srv/home:ro
       - api:/srv/api:ro
