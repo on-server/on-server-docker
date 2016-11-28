@@ -22,6 +22,7 @@ services:
       - /etc/letsencrypt/:/srv/letsencrypt:ro
       - ./containers/nginx-custom/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./containers/nginx-custom/conf.d:/etc/nginx/conf.d:ro
+      - ./containers/nginx-custom/dhparam.pem:/etc/nginx/dhparam.pem:ro
       - nginx:/srv/public:ro
       - users:/srv/home:ro
       - api:/srv/api:ro

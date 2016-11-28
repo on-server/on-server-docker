@@ -4,3 +4,4 @@ envs/*.env
 /tmp/
 .env
 *.password
+*.pem
