@@ -34,6 +34,7 @@ services:
       - apache2
       - api
       - phpmyadmin
+      - registry
 
   mysql55:
     restart: unless-stopped
@@ -103,6 +104,17 @@ services:
       - mysql57
     env_file:
       - ./envs/api.env
+
+  registry:
+    restart: unless-stopped
+    image: registry:2
+    env_file:
+      - ./envs/registry.env
+    volumes:
+      - registry:/data:rw
+    networks:
+      net:
+        ipv4_address: 172.16.238.80
 
 networks:
   net:
